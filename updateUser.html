@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>updateUser</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+    <title>updateUser</title>
+</head>
+<body onload="onPageLoading()">
+    <div class="container jumbotron">
+        <div class="text-center mb-4">
+            <h3>Chi tiết User</h3>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>First Name</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control" placeholder="Nhập First name ..." id="input-firstname" type= "text"/>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>Last Name</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control" placeholder="Nhập Last name ..." id="input-lastname" type= "text"/>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>Subject</label>
+            </div>
+            <div class="col-sm-8">
+                <input class="form-control" placeholder="Nhập Subject ..." id="input-subject" type= "text"/>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>Country</label>
+            </div>
+            <div class="col-sm-8">
+               <select class="form-control" id="select-country" name= "country">
+                    <option value="VN">Việt Nam</option>
+                    <option value="USA">USA</option>
+                    <option value="AUS">Australia</option>
+                    <option value="CAD">Canada</option>
+               </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>Customer Type</label>
+            </div>
+            <div class="col-sm-8">
+               <select class="form-control" id="select-customerType" name= "customerType">
+                    <option value="standard">Standard</option>
+                    <option value="gold">Gold</option>
+                    <option value="premium">Premium</option>
+               </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                <label>Register Status</label>
+            </div>
+            <div class="col-sm-8">
+               <select class="form-control" id="select-register-status" name= "registerStatus">
+                    <option value="new">New</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="denied">Denied</option>
+               </select>
+            </div>
+        </div>
+        <div class="row form-group">
+            <div class="col-sm-4">
+                
+            </div>
+            <div class="col-sm-8">
+                <button type="button" class="btn btn-success w-25" id="btn-update-user">Update User</button>
+                <button type="button" class="btn btn-success w-25">Hủy bỏ</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    "use strict";
+    const gREQUEST_STATUS_OK = 200;
+    const gREQUEST_READY_STATUS_FINISH_AND_OK = 4;
+    const gREQUEST_STATUS_CREATE_OK = 201;
+    const gREQUEST_STATUS_DELETE_OK = 204;
+    const gBASE_URL = "http://203.171.20.210:8080/crud-api/users/";
+
+    function onPageLoading(){
+        var vUrlString = window.location.href;
+        var vUrl = new URL(vUrlString);
+        var vId = vUrl.searchParams.get("id");
+        console.log(vId);
+        callApi(vId);
+    }
+    function callApi(paramId){
+        $.ajax({
+            url: "http://203.171.20.210:8080/crud-api/users/" + paramId,
+            type: "GET",
+            dataType: "json",
+            success: function (userObj){
+                console.log(userObj);
+                showData(userObj);
+            },
+            error: function (ajaxContent){
+                alert(ajaxContent.responseText);
+            },
+        });
+    }
+    function showData(paramID){
+        $("#input-firstname").val(paramID.firstname);
+        $("#input-lastname").val(paramID.lastname);
+        $("#input-country").val(paramID.country);
+        $("#input-subject").val(paramID.subject);
+        $("#input-customerType").val(paramID.customerType);
+        $("#input-register-status").val(paramID.registerStatus);
+    }
+
+    $("#btn-update-user").click(function(){
+        //console.log("aaa");
+        var vDataObj = getData();
+        var vCheckData = validateData(vDataObj);
+        if(vCheckData){
+            callAPIUpdateData(vDataObj);
+        }
+    });
+
+    function getData(){
+        var vUpdateDataObj = new Object();
+
+        var vFirstName = $("#input-firstname");
+        var vLastName = $("#input-lastname");
+        var vSubject = $("#input-subject");
+        var vCountry = $("#select-country");
+        var vCustomerType = $("#select-customerType");
+        var vRegister = $("#select-register-status");
+
+        vUpdateDataObj.firstname = $.trim(vFirstName.val());
+        vUpdateDataObj.lastname = $.trim(vLastName.val());
+        vUpdateDataObj.subject = $.trim(vSubject.val());
+        vUpdateDataObj.country = $.trim(vCountry.val());
+        vUpdateDataObj.customerType = $.trim(vCustomerType.val());
+        vUpdateDataObj.registerStatus = $.trim(vRegister.val());
+
+        return vUpdateDataObj;
+    }
+
+    function validateData(paramObj){
+        if (paramObj.firstname == ""){
+            alert("First name không được để trống!");
+            return false;
+        }
+        if (paramObj.lastname == ""){
+            alert("Last name không được để trống!");
+            return false;
+        }
+        if (paramObj.subject == ""){
+            alert("Subject không được để trống!");
+            return false;
+        }
+        if (paramObj.country == ""){
+            alert("Country không được để trống!");
+            return false;
+        }
+        if (paramObj.customerType == ""){
+            alert("Customer Type không được để trống!");
+            return false;
+        }
+        if (paramObj.registerStatus == ""){
+            alert("Register Status không được để trống!");
+            return false;
+        }
+        return true;
+    }
+
+    function callAPIUpdateData(paramObj) {
+      // 1. Đọc dữ liệu
+      var vUserId = getCurrentId();
+      
+      $.ajax({
+        url: gBASE_URL + vUserId,
+        type: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(paramObj), // added data type
+        success: updateSuccessStatus,
+        error: updateErrorStatus
+      });
+    }
+    // callback function update id
+    function updateSuccessStatus(paramRes){
+      alert("User Id: " + paramRes.id + " Cập nhật thành công!")
+      console.log(Object.entries(paramRes));
+      window.location.href = "listUsers.html";
+    }
+
+    function updateErrorStatus(paramRes){
+      alert(paramRes.responseText);
+    }
+
+    function getCurrentId(){
+        var vId = null;
+        var vUrl = new URL(window.location.href);
+
+        vId = vUrl.searchParams.get("id");
+        return vId;
+    }
+
+</script>
+</html>
